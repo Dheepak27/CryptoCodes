@@ -1,0 +1,241 @@
+sbox = [
+    ["0x63", "0x7C", "0x77", "0x7B", "0xF2", "0x6B", "0x6F", "0xC5", "0x30", "0x01", "0x67", "0x2B", "0xFE", "0xD7", "0xAB", "0x76"],
+    ["0xCA", "0x82", "0xC9", "0x7D", "0xFA", "0x59", "0x47", "0xF0", "0xAD", "0xD4", "0xA2", "0xAF", "0x9C", "0xA4", "0x72", "0xC0"],
+    ["0xB7", "0xFD", "0x93", "0x26", "0x36", "0x3F", "0xF7", "0xCC", "0x34", "0xA5", "0xE5", "0xF1", "0x71", "0xD8", "0x31", "0x15"],
+    ["0x04", "0xC7", "0x23", "0xC3", "0x18", "0x96", "0x05", "0x9A", "0x07", "0x12", "0x80", "0xE2", "0xEB", "0x27", "0xB2", "0x75"],
+    ["0x09", "0x83", "0x2C", "0x1A", "0x1B", "0x6E", "0x5A", "0xA0", "0x52", "0x3B", "0xD6", "0xB3", "0x29", "0xE3", "0x2F", "0x84"],
+    ["0x53", "0xD1", "0x00", "0xED", "0x20", "0xFC", "0xB1", "0x5B", "0x6A", "0xCB", "0xBE", "0x39", "0x4A", "0x4C", "0x58", "0xCF"],
+    ["0xD0", "0xEF", "0xAA", "0xFB", "0x43", "0x4D", "0x33", "0x85", "0x45", "0xF9", "0x02", "0x7F", "0x50", "0x3C", "0x9F", "0xA8"],
+    ["0x51", "0xA3", "0x40", "0x8F", "0x92", "0x9D", "0x38", "0xF5", "0xBC", "0xB6", "0xDA", "0x21", "0x10", "0xFF", "0xF3", "0xD2"],
+    ["0xCD", "0x0C", "0x13", "0xEC", "0x5F", "0x97", "0x44", "0x17", "0xC4", "0xA7", "0x7E", "0x3D", "0x64", "0x5D", "0x19", "0x73"],
+    ["0x60", "0x81", "0x4F", "0xDC", "0x22", "0x2A", "0x90", "0x88", "0x46", "0xEE", "0xB8", "0x14", "0xDE", "0x5E", "0x0B", "0xDB"],
+    ["0xE0", "0x32", "0x3A", "0x0A", "0x49", "0x06", "0x24", "0x5C", "0xC2", "0xD3", "0xAC", "0x62", "0x91", "0x95", "0xE4", "0x79"],
+    ["0xE7", "0xC8", "0x37", "0x6D", "0x8D", "0xD5", "0x4E", "0xA9", "0x6C", "0x56", "0xF4", "0xEA", "0x65", "0x7A", "0xAE", "0x08"],
+    ["0xBA", "0x78", "0x25", "0x2E", "0x1C", "0xA6", "0xB4", "0xC6", "0xE8", "0xDD", "0x74", "0x1F", "0x4B", "0xBD", "0x8B", "0x8A"],
+    ["0x70", "0x3E", "0xB5", "0x66", "0x48", "0x03", "0xF6", "0x0E", "0x61", "0x35", "0x57", "0xB9", "0x86", "0xC1", "0x1D", "0x9E"],
+    ["0xE1", "0xF8", "0x98", "0x11", "0x69", "0xD9", "0x8E", "0x94", "0x9B", "0x1E", "0x87", "0xE9", "0xCE", "0x55", "0x28", "0xDF"],
+    ["0x8C", "0xA1", "0x89", "0x0D", "0xBF", "0xE6", "0x42", "0x68", "0x41", "0x99", "0x2D", "0x0F", "0xB0", "0x54", "0xBB", "0x16"]
+]
+
+
+
+hexmap = {
+    '0': 0,'1': 1,'2': 2,'3': 3,'4': 4,'5': 5,'6': 6,'7': 7,'8': 8,'9': 9,'A': 10,'B': 11,'C': 12,'D': 13,'E': 14,'F': 15
+}
+
+hextobin = {
+    '0': '0000','1': '0001','2': '0010','3': '0011','4': '0100','5': '0101','6': '0110','7': '0111','8': '1000','9': '1001','A': '1010','B': '1011','C': '1100','D': '1101','E': '1110','F': '1111'
+}
+
+bintohex = {
+    '0000': '0','0001': '1','0010': '2','0011': '3','0100': '4','0101': '5','0110': '6','0111': '7','1000': '8','1001': '9','1010': 'A','1011': 'B','1100': 'C','1101': 'D','1110': 'E','1111': 'F'
+}
+
+
+
+def hex(k):
+    return (bintohex[k[:4]]+bintohex[k[4:]])
+
+def subbyte(l):
+    sub=[]
+    for i in range(4):
+        t=[]
+        for j in range(4):
+            row=l[i][j][2]
+            col=l[i][j][3]
+            row=hexmap[row]
+            col=hexmap[col]
+            t.append(sbox[row][col])
+        sub.append(t)
+    return sub
+            
+def shifttrans(sub):
+    shift=[]
+    k=0
+    for i in range(4):  
+        t=sub[k]
+        t=t[i:]+t[:i]
+        shift.append(t)
+        k+=1
+    return shift
+
+
+
+def xor(t1,t2):
+    ans=""
+    for i in range(len(t1)):
+        if(t1[i]==t2[i]):
+            ans+="0"
+        else:
+            ans+="1"
+    return ans
+
+def mixcols(shift):
+    mrow=[['02','03','01','01'],
+      ['01','02','03','01'],
+      ['01','01','02','03'],
+      ['03','01','01','02']]
+      
+    res=[]
+    for i in range(4):
+        q=[]
+        for j in range(4):
+            t=[]
+            for k in range(4):
+                flag=0
+                if(mrow[i][k]=='01'):
+                    r=hextobin[shift[k][j][2]]+hextobin[shift[k][j][3]]
+                    t.append(r)
+                if(mrow[i][k]=='02'):
+                    r=hextobin[shift[k][j][2]]+hextobin[shift[k][j][3]]
+                    if(r[0]=='1'):
+                        flag=1
+                    r=r[1:]+'0'
+                    if(flag==1):
+                        r=xor(r,'00011011')
+                    t.append(r)
+                if(mrow[i][k]=='03'):
+                    temp=hextobin[shift[k][j][2]]+hextobin[shift[k][j][3]]
+                    r=hextobin[shift[k][j][2]]+hextobin[shift[k][j][3]]
+                    if(r[0]=='1'):
+                        flag=1
+                    r=r[1:]+'0'
+                    if(flag==1):
+                        r=xor(r,'00011011')
+                    r=xor(r,temp)
+                    t.append(r)
+            result='00000000'
+            for p in range(0,len(t)):
+                result=xor(result,t[p])
+            q.append('0x'+hex(result))
+        res.append(q)
+    return res
+    
+def addrk(res,rk):
+    ans=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+    for i in range(4):
+        for j in range(4):
+            r1=hextobin[res[i][j][2]]+hextobin[res[i][j][3]]
+            r2=hextobin[rk[i][j][2]]+hextobin[rk[i][j][3]]
+            ans[i][j]='0x'+hex(xor(r1,r2))
+    return ans
+
+
+l = [['0xEA', '0x04', '0x65', '0x85'],
+    ['0x83', '0x45', '0x5D', '0x96'],
+    ['0x5C', '0x33', '0x98', '0xB0'],
+    ['0xF0', '0x2D', '0xAD', '0xC5']]
+
+rk=[['0F','15','71','C9'],
+    ['47','D9','E8','59'],
+    ['0C','B7','AD','D6'],
+    ['AF','7F','67','98']]
+
+def keyexpansion():
+
+
+    rcon=['01','02','04','08','10','20','40','80','1B','36']
+
+    W=[]
+    W0 = ["0x0F", "0x15", "0x71", "0xC9"]
+    W1 = ["0x47", "0xD9", "0xE8", "0x59"]
+    W2 = ["0x0C", "0xB7", "0xAD", "0xD6"]
+    W3 = ["0xAF", "0x7F", "0x67", "0x98"]
+
+    W.append(W0)
+    W.append(W1)
+    W.append(W2)
+    W.append(W3)
+
+    def g(w):
+        rot=w[1:]+w[0:1]
+        sub=[]
+        for i in range(len(rot)):
+            row=rot[i][2]
+            col=rot[i][3]
+            sub.append(sbox[hexmap[row]][hexmap[col]])
+        return sub
+
+
+    def xor(t1,t2):
+        ans=""
+        for i in range(len(t1)):
+            if(t1[i]==t2[i]):
+                ans+="0"
+            else:
+                ans+="1"
+        return ans
+
+
+    k=0
+    p=0
+    for i in range(4,44):
+        l=[]
+        if(i%4==0):
+            z1=g(W[len(W)-1])
+            r1=hextobin[z1[0][2]]+hextobin[z1[0][3]]
+            r2=hextobin[rcon[p][0]]+hextobin[rcon[p][1]]
+            res=(xor(r1,r2))
+            z1[0]='0x'+bintohex[res[0:4]]+bintohex[res[4:]]
+            l=[]
+            for i in range(len(z1)):
+                op=W[k]
+                t1=hextobin[z1[i][2]]+hextobin[z1[i][3]]
+                t2=hextobin[op[i][2]]+hextobin[op[i][3]]
+                res=xor(t1,t2)
+                l.append('0x'+bintohex[res[0:4]]+bintohex[res[4:]])
+            p+=1
+        else:
+            for i in range(4):
+                curr=W[len(W)-1]
+                op=W[k]
+                t1=hextobin[curr[i][2]]+hextobin[curr[i][3]]
+                t2=hextobin[op[i][2]]+hextobin[op[i][3]]
+                res=xor(t1,t2)
+                l.append('0x'+bintohex[res[0:4]]+bintohex[res[4:]])
+        W.append(l)
+        k+=1
+
+
+    for i in range(0,len(W)):
+        print("W"+str(i)+"\t",W[i])
+    return W 
+
+
+def main():
+    print("Plain Text : ",l)
+    W=keyexpansion()
+    rk=[]
+    rk.append(W[0])
+    rk.append(W[1])
+    rk.append(W[2])
+    rk.append(W[3])
+    x=addrk(l,rk)
+    print("Round :  0 ",x)
+    ind=1
+    for i in range(4,40,4):
+        rk=[]
+        rk.append(W[i])
+        rk.append(W[i+1])
+        rk.append(W[i+2])
+        rk.append(W[i+3])
+        a=subbyte(x)
+        b=shifttrans(a)
+        c=mixcols(b)
+        x=addrk(c,rk)
+        print("Round : ",ind,x)
+        ind+=1
+    
+    rk=[]
+    rk.append(W[40])
+    rk.append(W[41])
+    rk.append(W[42])
+    rk.append(W[43])
+    a=subbyte(x)
+    b=shifttrans(a)
+    x=addrk(b,rk)
+    print("Encrypted Text : ",x)
+main()
+
+
+
